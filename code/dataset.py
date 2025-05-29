@@ -5,6 +5,8 @@ import logging
 import shutil # For creating/removing a temporary directory for cache if needed for testing
 import pickle
 import os
+os.environ['CURL_CA_BUNDLE'] = ''
+os.environ['REQUESTS_CA_BUNDLE'] = ''
 import collections # For Counter
 
 import torch
