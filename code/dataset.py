@@ -5,12 +5,22 @@ import logging
 import shutil # For creating/removing a temporary directory for cache if needed for testing
 import pickle
 import os
+import collections # For Counter
 
 import torch
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, PreTrainedTokenizerFast
 from tqdm import tqdm
 from torch.nn.utils.rnn import pad_sequence
+
+try:
+    import matplotlib.pyplot as plt
+    import numpy as np # Often used with matplotlib
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+    logger = logging.getLogger(__name__) # Ensure logger is defined if matplotlib fails
+    logger.warning("matplotlib or numpy not found. Histogram will be text-based.")
 
 # --- Standard Logging Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
@@ -334,6 +344,213 @@ def collate_fn(batch: List[Dict[str, torch.Tensor]], pad_token_id: int) -> Dict[
         "attention_mask": attention_mask
     }
 
+def find_max_context_length_for_logs(jsonl_dir: Path, log_tokenizer: LogTokenizer, file_limit: Optional[int] = None):
+    """
+    Finds the JSONL line with the maximum number of characters across all specified files,
+    serializes it, tokenizes it, and prints information about its length.
+
+    Args:
+        jsonl_dir (Path): Directory containing the .jsonl log files.
+        log_tokenizer (LogTokenizer): Initialized instance of LogTokenizer.
+        file_limit (Optional[int]): Limits the number of JSONL files processed.
+    """
+    if not jsonl_dir.is_dir():
+        logger.error(f"Provided JSONL directory does not exist: {jsonl_dir}")
+        return
+
+    jsonl_files = sorted(list(jsonl_dir.glob("*.jsonl")))
+    if not jsonl_files:
+        logger.warning(f"No .jsonl files found in {jsonl_dir}")
+        return
+
+    if file_limit is not None:
+        jsonl_files = jsonl_files[:file_limit]
+        logger.info(f"Analyzing up to {len(jsonl_files)} files.")
+
+    max_char_len_raw = 0
+    longest_raw_line_content = ""
+    longest_raw_line_file = None
+    longest_raw_line_num = -1
+
+    logger.info("Scanning files to find the longest raw JSONL line by character count...")
+    for file_path in tqdm(jsonl_files, desc="Scanning files"):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for i, line_str in enumerate(f):
+                    line_char_len = len(line_str)
+                    if line_char_len > max_char_len_raw:
+                        max_char_len_raw = line_char_len
+                        longest_raw_line_content = line_str.strip()
+                        longest_raw_line_file = file_path
+                        longest_raw_line_num = i + 1
+        except Exception as e:
+            logger.error(f"Error reading file {file_path}: {e}")
+            continue
+
+    if not longest_raw_line_content:
+        logger.warning("No processable lines found in the JSONL files.")
+        return
+
+    logger.info(f"\n--- Longest Raw JSONL Line Found ---")
+    logger.info(f"File: {longest_raw_line_file}")
+    logger.info(f"Line Number: {longest_raw_line_num}")
+    logger.info(f"Character Length (raw line): {max_char_len_raw}")
+    # logger.info(f"Raw Content (first 200 chars): {longest_raw_line_content[:200]}...")
+
+    try:
+        log_entry_dict = json.loads(longest_raw_line_content)
+    except json.JSONDecodeError as e:
+        logger.error(f"Could not parse the longest line as JSON: {e}")
+        logger.error(f"Content was: {longest_raw_line_content[:500]}...")
+        return
+
+    logger.info("\n--- Serializing and Tokenizing Longest Line ---")
+    serialized_string = log_tokenizer.serialize_log_entry(log_entry_dict)
+    char_len_serialized = len(serialized_string)
+
+    # Tokenize: For estimating max context, we should include BOS/EOS if the model
+    # processes each entry as a full sequence framed by them.
+    token_ids = log_tokenizer.encode(serialized_string, add_special_tokens=True) # Add BOS/EOS
+    num_tokens = len(token_ids)
+
+    logger.info(f"Character Length (serialized): {char_len_serialized}")
+    logger.info(f"Number of Tokens (for this single longest entry, including BOS/EOS): {num_tokens}")
+    logger.info(f"This token count ({num_tokens}) is an approximate upper bound for context length "
+                f"if each log entry is treated as an independent sequence.")
+    logger.info("For pretraining where sequences are concatenated and chunked, the chosen context length "
+                "can be independent of any single line's tokenized length, but this gives "
+                "an idea of the complexity of individual entries.")
+
+def analyze_and_plot_token_length_distribution(
+    jsonl_dir: Path, 
+    log_tokenizer: LogTokenizer, 
+    file_limit: Optional[int] = None,
+    max_token_len_for_hist: int = 4096 # Cap histogram display range
+    ):
+    """
+    Analyzes all JSONL files in a directory to get the distribution of
+    tokenized log entry lengths and plots a histogram.
+
+    Args:
+        jsonl_dir (Path): Directory containing the .jsonl log files.
+        log_tokenizer (LogTokenizer): Initialized instance of LogTokenizer.
+        file_limit (Optional[int]): Limits the number of JSONL files processed.
+        max_token_len_for_hist (int): Max token length to consider for histogram binning.
+    """
+    if not jsonl_dir.is_dir():
+        logger.error(f"Provided JSONL directory does not exist: {jsonl_dir}")
+        return
+
+    jsonl_files = sorted(list(jsonl_dir.glob("*.jsonl")))
+    if not jsonl_files:
+        logger.warning(f"No .jsonl files found in {jsonl_dir}")
+        return
+
+    if file_limit is not None:
+        jsonl_files = jsonl_files[:file_limit]
+        logger.info(f"Analyzing up to {len(jsonl_files)} files for token length distribution.")
+
+    all_token_lengths: List[int] = []
+
+    logger.info("Processing all JSONL lines to get token lengths...")
+    for file_path in tqdm(jsonl_files, desc="Analyzing files"):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for line_str in f:
+                    if not line_str.strip():
+                        continue
+                    try:
+                        log_entry_dict = json.loads(line_str.strip())
+                        serialized_string = log_tokenizer.serialize_log_entry(log_entry_dict)
+                        # Tokenize with BOS/EOS as each entry is considered a sequence here
+                        token_ids = log_tokenizer.encode(serialized_string, add_special_tokens=True)
+                        all_token_lengths.append(len(token_ids))
+                    except json.JSONDecodeError:
+                        logger.debug(f"Skipping malformed JSON line in {file_path}")
+                    except Exception as e:
+                        logger.debug(f"Error tokenizing line in {file_path}: {e}")
+        except Exception as e:
+            logger.error(f"Error reading file {file_path}: {e}")
+            continue
+    
+    if not all_token_lengths:
+        logger.warning("No token lengths were recorded. Cannot generate distribution.")
+        return
+
+    logger.info(f"\n--- Token Length Distribution Analysis (for {len(all_token_lengths)} log entries) ---")
+    
+    # Summary Statistics
+    if MATPLOTLIB_AVAILABLE: # numpy is imported if matplotlib is
+        lengths_np = np.array(all_token_lengths)
+        logger.info(f"Min token length: {np.min(lengths_np)}")
+        logger.info(f"Max token length: {np.max(lengths_np)}")
+        logger.info(f"Mean token length: {np.mean(lengths_np):.2f}")
+        logger.info(f"Median token length: {np.median(lengths_np)}")
+        logger.info(f"90th percentile: {np.percentile(lengths_np, 90):.2f}")
+        logger.info(f"95th percentile: {np.percentile(lengths_np, 95):.2f}")
+        logger.info(f"99th percentile: {np.percentile(lengths_np, 99):.2f}")
+        logger.info(f"99.9th percentile: {np.percentile(lengths_np, 99.9):.2f}")
+    else: # Basic stats without numpy
+        all_token_lengths.sort()
+        logger.info(f"Min token length: {all_token_lengths[0] if all_token_lengths else 'N/A'}")
+        logger.info(f"Max token length: {all_token_lengths[-1] if all_token_lengths else 'N/A'}")
+        mean_len = sum(all_token_lengths) / len(all_token_lengths) if all_token_lengths else 0
+        logger.info(f"Mean token length: {mean_len:.2f}")
+        # (Percentiles are harder without numpy/scipy, so skipping for text-only)
+
+    # Plotting with Matplotlib
+    if MATPLOTLIB_AVAILABLE:
+        plt.figure(figsize=(12, 7))
+        # Filter lengths for histogram display range to avoid extremely long tails making plot unreadable
+        display_lengths = [l for l in all_token_lengths if l <= max_token_len_for_hist]
+        if not display_lengths: # If all lengths are > max_token_len_for_hist
+            display_lengths = all_token_lengths # Show all in this case
+
+        plt.hist(display_lengths, bins=50, edgecolor='black', alpha=0.7) # Adjust bins as needed
+        plt.title(f'Histogram of Tokenized Log Entry Lengths (Capped at {max_token_len_for_hist} for display)')
+        plt.xlabel('Number of Tokens per Log Entry (including BOS/EOS)')
+        plt.ylabel('Number of Log Entries')
+        plt.grid(axis='y', alpha=0.75)
+        
+        # Add vertical lines for percentiles if numpy was used
+        if 'lengths_np' in locals():
+             plt.axvline(np.percentile(lengths_np, 90), color='red', linestyle='dashed', linewidth=1, label=f'90th: {np.percentile(lengths_np, 90):.0f}')
+             plt.axvline(np.percentile(lengths_np, 95), color='orange', linestyle='dashed', linewidth=1, label=f'95th: {np.percentile(lengths_np, 95):.0f}')
+             plt.axvline(np.percentile(lengths_np, 99), color='purple', linestyle='dashed', linewidth=1, label=f'99th: {np.percentile(lengths_np, 99):.0f}')
+             plt.legend()
+
+        plot_save_path = Path.cwd() / "outputs" / "token_length_histogram.png"
+        try:
+            plt.savefig(plot_save_path)
+            logger.info(f"Histogram plot saved to: {plot_save_path}")
+        except Exception as e:
+            logger.error(f"Could not save histogram plot: {e}")
+        # plt.show() # Uncomment if running in an environment that supports GUI pop-ups
+        plt.close() # Close the figure
+    else:
+        logger.info("Text-based histogram / frequency count:")
+        counts = collections.Counter(all_token_lengths)
+        # Binning for text display
+        max_val = max(all_token_lengths) if all_token_lengths else 0
+        bin_size = max(1, (max_val // 20) if max_val > 20 else 1) # Aim for ~20 bins
+        bins = range(0, max_val + bin_size, bin_size)
+        
+        binned_counts = collections.defaultdict(int)
+        for length in all_token_lengths:
+            for i in range(len(bins) - 1):
+                if bins[i] <= length < bins[i+1]:
+                    binned_counts[f"{bins[i]}-{bins[i+1]-1}"] += 1
+                    break
+            else: # handle last bin edge case
+                 if length == bins[-1]:
+                     binned_counts[f"{bins[-2]}-{bins[-1]}"] +=1
+
+
+        logger.info("Token Length Bins | Count")
+        logger.info("-----------------|-------")
+        for bin_range, count in sorted(binned_counts.items(), key=lambda item: int(item[0].split('-')[0])):
+            logger.info(f"{bin_range:<17} | {count}")
+
 
 def main():
     # --- Configuration ---
@@ -354,12 +571,19 @@ def main():
         logger.error(f"Failed to initialize LogTokenizer: {e}")
         return
     
-    # Conceptual resize if you were fine-tuning a model
-    # model = AutoModelForCausalLM.from_pretrained(base_tokenizer_model, trust_remote_code=True) # Example
-    # model.resize_token_embeddings(log_tokenizer.get_vocab_size())
-    # logger.info(f"Conceptual: Model token embeddings would be resized to: {log_tokenizer.get_vocab_size()}")
-
-
+    # find_max_context_length_for_logs(
+    #     jsonl_dir=jsonl_directory_path,
+    #     log_tokenizer=log_tokenizer,
+    #     file_limit=None # Set to a number to limit files, e.g., 5 for testing
+    # )
+    
+    # analyze_and_plot_token_length_distribution(
+    #     jsonl_dir=jsonl_directory_path,
+    #     log_tokenizer=log_tokenizer,
+    #     file_limit=None, # Set to a number to limit files, e.g., 5 for testing
+    #     max_token_len_for_hist=15000 # Cap histogram display range
+    # ) 
+    
     # --- 2. Initialize LogDataset ---
     logger.info(f"\n--- Initializing LogDataset ---")
     try:
@@ -418,3 +642,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
