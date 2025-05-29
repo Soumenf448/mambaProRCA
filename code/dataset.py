@@ -152,7 +152,7 @@ class LogTokenizer:
                 serialized_parts.append(f" {start_tag}{value}{end_tag}")
         
         serialized_parts.append(f" {self.entry_end_token}")
-        return "".join(serialized_parts).strip() + self.tokenizer.eos_token_id
+        return "".join(serialized_parts).strip() + self.tokenizer.eos_token
 
     def encode(self, text: str, add_special_tokens: bool = False, **kwargs) -> List[int]:
         return self.tokenizer.encode(text, add_special_tokens=add_special_tokens, **kwargs)
@@ -344,7 +344,7 @@ def main():
     # base_tokenizer_model = "state-spaces/mamba-2.8b-slimpj" # If you have this downloaded or network access
     
     batch_size_for_test = 2
-    max_seq_len_for_item = 256 # Max length for a single serialized log line after tokenization
+    max_seq_len_for_item = 4096 # Max length for a single serialized log line after tokenization
 
     # --- 1. Initialize LogTokenizer ---
     logger.info(f"--- Initializing LogTokenizer with base: {base_tokenizer_model} ---")
