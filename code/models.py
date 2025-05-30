@@ -9,7 +9,7 @@ from pathlib import Path
 
 import torch
 from dataset import LogTokenizer, LogDataset, collate_fn
-from transformers import (AutoModelForCausalLM, MambaForCausalLM,
+from transformers import (AutoModelForCausalLM, MambaForCausalLM, AutoTokenizer,
                           BitsAndBytesConfig)
 from typing import List, Dict, Tuple, Union
 from metrics import Metrics
@@ -156,10 +156,67 @@ class SSModelForCLMWithLoRA(torch.nn.Module):
         
         for param in self.model.parameters():
             param.requires_grad = False
+            
+        self.unfreeze_and_mask_embeddings(tokenizer_name=tokenizer_name) # Unfreeze and mask new token embeddings
         
         self.rank = lora_rank
         self.alpha = lora_alpha
         self.apply_lora(rank=self.rank, alpha=self.alpha, layer_names=layer_names)
+        
+    def unfreeze_and_mask_embeddings(self, tokenizer_name: str):
+        """Unfreezes and applies gradient masks to train only new token embeddings."""
+        try:
+            # Load the base tokenizer to get its original size
+            base_hf_tokenizer = AutoTokenizer.from_pretrained(
+                tokenizer_name,
+                trust_remote_code=True
+            )
+            original_vocab_size = len(base_hf_tokenizer)
+            self._original_vocab_size_for_masking = original_vocab_size # Store for reference
+            print(f"Original vocabulary size from '{tokenizer_name}': {original_vocab_size}")
+        except Exception as e:
+            print(f"ERROR: Could not load base tokenizer '{tokenizer_name}' to determine original_vocab_size: {e}")
+            print("Cannot proceed with selective embedding training. Embeddings will remain as per initial freezing.")
+            return
+
+        current_full_vocab_size = len(self.tokenizer) # self.tokenizer is the augmented one
+        num_new_tokens = current_full_vocab_size - original_vocab_size
+
+        if num_new_tokens < 0:
+            print(
+                f"Warning: original_vocab_size ({original_vocab_size}) from '{tokenizer_name}' "
+                f"is greater than the current augmented tokenizer's vocab size ({current_full_vocab_size}). "
+                "This indicates a mismatch. Check tokenizer configurations. No embedding unfreezing will occur."
+            )
+            return
+        
+        if num_new_tokens == 0:
+            print("No new tokens detected based on original_vocab_size. No selective embedding unfreezing needed.")
+            return
+
+        print(f"Preparing to selectively train embeddings for {num_new_tokens} new tokens.")
+
+        # --- Handle Input Embeddings ---
+        input_embeddings_layer = self.model.model.get_input_embeddings()
+        if input_embeddings_layer is not None:
+            print(f"Unfreezing and masking new input token embeddings (IDs {original_vocab_size} to {current_full_vocab_size-1}).")
+            input_embeddings_layer.weight.requires_grad = True 
+
+            new_token_ids_input = torch.arange(original_vocab_size, current_full_vocab_size, device=self.device)
+
+            # Check if hook already exists to prevent double registration if called multiple times (though usually not)
+            if not hasattr(input_embeddings_layer.weight, '_gradient_hook_input_embed'):
+                def input_embedding_grad_hook(grad):
+                    mask = torch.zeros_like(grad)
+                    mask[new_token_ids_input] = 1.0 # new_token_ids_input is already on self.device
+                    return grad * mask
+                
+                h = input_embeddings_layer.weight.register_hook(input_embedding_grad_hook)
+                input_embeddings_layer.weight._gradient_hook_input_embed = h # Store handle to potentially remove later if needed
+            else:
+                print("Input embedding gradient hook already registered.")
+        else:
+            print("Warning: Could not get input_embeddings_layer for selective training.")
     
     def apply_lora(self, rank: int, alpha: float, layer_names: List[str]) -> None:
         SSModelForCLMWithLoRA.replace_linear_with_lora(device=self.device, model=self.model, rank=rank, alpha=alpha, layer_names=layer_names)            
@@ -194,8 +251,9 @@ def main_clm(model_name: str, device: torch.device) -> None:
         bnb_4bit_compute_dtype=torch.bfloat16,  
         bnb_4bit_use_double_quant=True,  
     ) if False else None
-    # model = SSModelForCLM(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=6144, grad_acc_steps=1, quant_config=quant_config).to(device)
-    model = SSModelForCLMWithLoRA(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=6144, grad_acc_steps=1, quant_config=quant_config, lora_rank=64, lora_alpha=128, layer_names=['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head']).to(device)
+    Tmax = 1024
+    # model = SSModelForCLM(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=Tmax, grad_acc_steps=1, quant_config=quant_config).to(device)
+    model = SSModelForCLMWithLoRA(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=Tmax, grad_acc_steps=1, quant_config=quant_config, lora_rank=64, lora_alpha=128, layer_names=['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head']).to(device)
     
     log_tokenizer = LogTokenizer(base_tokenizer_name="EleutherAI/gpt-neox-20b")
     log_dataset = LogDataset(
@@ -204,10 +262,10 @@ def main_clm(model_name: str, device: torch.device) -> None:
         cache_dir=Path(Path.cwd(), "data/log_dataset_item_cache"),
         rebuild_index_cache=False, # Set to True for the first run or if files change
         file_limit=None, # Process all files
-        max_seq_len=6144
+        max_seq_len=Tmax
     )
     
-    collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=6144)
+    collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=Tmax)
     dataloader = DataLoader(log_dataset, batch_size=4, shuffle=False, collate_fn=collate_function)
     
     batch = next(iter(dataloader))

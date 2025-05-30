@@ -6,6 +6,7 @@ if __name__ == "__main__":
 
 import pickle
 import torch
+from torch.utils.data import Subset
 from transformers import (BitsAndBytesConfig, DefaultDataCollator,
                           TrainingArguments, Trainer,
                           get_linear_schedule_with_warmup)
@@ -37,6 +38,7 @@ class LoRAFineTuner:
                                    file_limit=max(1, int(config["frac"] * 81)),
                                    max_seq_len=config["max_context_len"])
         
+        self.train_ds = Subset(dataset=self.train_ds, indices=range(int(len(self.train_ds) * config["frac"])))
         self.data_collator = lambda batch: collate_fn(batch, pad_token_id=self.log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=config["max_context_len"])
 
         self.batch_size = self.config["batch_size"]
@@ -149,8 +151,8 @@ def main(model_name: str, device: torch.device) -> None:
         "model_name": model_name, "tokenizer_name": "EleutherAI/gpt-neox-20b", "task_name": "proactiveRCA", 
         "jsonl_dir": "data/dcn_jsonl", "cache_dir": "data/log_dataset_item_cache",
         "num_epochs": 1, "batch_size": 1, "max_context_len": 6144, 
-        "frac": 0.01, "target_modules": ['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head'],
-        "initial_lr": 1e-5, "lora_rank": 8, "lora_alpha": 16, "max_grad_norm": 10.0, "weight_decay": 0.1,
+        "frac": 1.0, "target_modules": ['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head'],
+        "initial_lr": 1e-5, "lora_rank": 64, "lora_alpha": 128, "max_grad_norm": 10.0, "weight_decay": 0.1,
         "adam_betas": (0.95, 0.999), "grad_acc_steps": 16, "num_ckpt_per_epoch": 5, "is_4bit_quant": False, "fp16": False, "bf16": True,
         "wandb_log": True
     }
