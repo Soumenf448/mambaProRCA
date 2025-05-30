@@ -1,10 +1,14 @@
+import os
+if __name__ == "__main__":
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+    
 import json
 from pathlib import Path
 from typing import List, Dict, Optional, Any
 import logging
 import shutil # For creating/removing a temporary directory for cache if needed for testing
 import pickle
-import os
+
 os.environ['CURL_CA_BUNDLE'] = ''
 os.environ['REQUESTS_CA_BUNDLE'] = ''
 import collections # For Counter
@@ -24,10 +28,12 @@ except ImportError:
     logger = logging.getLogger(__name__) # Ensure logger is defined if matplotlib fails
     logger.warning("matplotlib or numpy not found. Histogram will be text-based.")
 
+seed = 42
+torch.manual_seed(seed)
+
 # --- Standard Logging Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 logger = logging.getLogger(__name__)
-
 
 class LogTokenizer:
     def __init__(self, base_tokenizer_name: str = "EleutherAI/gpt-neox-20b"):
@@ -190,8 +196,8 @@ class LogDataset(Dataset):
                 ):
         self.log_tokenizer_wrapper = log_tokenizer
         self.tokenizer = log_tokenizer.tokenizer # The actual Hugging Face tokenizer
-        self.jsonl_dir = jsonl_dir
-        self.cache_dir = cache_dir
+        self.jsonl_dir = Path(jsonl_dir)
+        self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.file_limit = file_limit
         self.max_seq_len = max_seq_len
@@ -317,35 +323,92 @@ class LogDataset(Dataset):
             "labels": torch.tensor(labels, dtype=torch.long)
         }
 
-def collate_fn(batch: List[Dict[str, torch.Tensor]], pad_token_id: int) -> Dict[str, torch.Tensor]:
-    """
-    Collate function to pad sequences in a batch to the max length in that batch.
-    """
-    input_ids_list = [item['input_ids'] for item in batch if item['input_ids'].numel() > 0] # Filter empty tensors
-    labels_list = [item['labels'] for item in batch if item['labels'].numel() > 0]
+import torch
+from typing import List, Dict, Optional # Optional might not be strictly needed here but good for clarity
 
-    if not input_ids_list: # If all items in batch were empty
+def collate_fn(
+    batch: List[Dict[str, torch.Tensor]],
+    pad_token_id: int,
+    fixed_max_context_length: int  # New argument for fixed length
+) -> Dict[str, torch.Tensor]:
+    """
+    Collate function to pad or truncate sequences in a batch to a fixed maximum context length.
+    """
+    processed_input_ids = []
+    processed_labels = []
+
+    # Process each item in the batch
+    for item in batch:
+        input_ids = item.get('input_ids')
+        labels = item.get('labels')
+
+        # Skip item if essential data is missing or empty
+        # This handles cases where __getitem__ might return empty tensors for problematic lines
+        if input_ids is None or labels is None or input_ids.numel() == 0 or labels.numel() == 0:
+            continue
+
+        current_len = input_ids.size(0) # Assuming input_ids and labels from __getitem__ have same length
+
+        # --- Process input_ids ---
+        if current_len == fixed_max_context_length:
+            final_input_ids = input_ids
+        elif current_len > fixed_max_context_length:
+            # Truncate
+            final_input_ids = input_ids[:fixed_max_context_length]
+        else: # current_len < fixed_max_context_length
+            # Pad
+            padding_size = fixed_max_context_length - current_len
+            padding = torch.full(
+                (padding_size,),
+                pad_token_id,
+                dtype=input_ids.dtype,
+                device=input_ids.device
+            )
+            final_input_ids = torch.cat([input_ids, padding])
+        processed_input_ids.append(final_input_ids)
+
+        # --- Process labels ---
+        # Labels are padded with -100 (standard for cross-entropy loss ignore_index)
+        if current_len == fixed_max_context_length:
+            final_labels = labels
+        elif current_len > fixed_max_context_length:
+            # Truncate
+            final_labels = labels[:fixed_max_context_length]
+        else: # current_len < fixed_max_context_length
+            # Pad
+            padding_size = fixed_max_context_length - current_len
+            padding = torch.full(
+                (padding_size,),
+                -100,  # Padding value for labels
+                dtype=labels.dtype,
+                device=labels.device
+            )
+            final_labels = torch.cat([labels, padding])
+        processed_labels.append(final_labels)
+
+    # If all items in the batch were filtered out (e.g., all were empty)
+    if not processed_input_ids:
+        # Return empty tensors with the correct target sequence dimension
         return {
-            "input_ids": torch.empty(0,0, dtype=torch.long), 
-            "labels": torch.empty(0,0, dtype=torch.long),
-            "attention_mask": torch.empty(0,0, dtype=torch.long)
+            "input_ids": torch.empty(0, fixed_max_context_length, dtype=torch.long),
+            "labels": torch.empty(0, fixed_max_context_length, dtype=torch.long),
+            "attention_mask": torch.empty(0, fixed_max_context_length, dtype=torch.long)
         }
 
-    # Pad input_ids
-    input_ids_padded = pad_sequence(input_ids_list, batch_first=True, padding_value=pad_token_id)
-    
-    # Create attention mask for input_ids
-    attention_mask = (input_ids_padded != pad_token_id).long()
-    
-    # Pad labels. For causal LM, labels are usually padded with -100 (ignored by loss function)
-    labels_padded = pad_sequence(labels_list, batch_first=True, padding_value=-100) 
-    
-    return {
-        "input_ids": input_ids_padded,
-        "labels": labels_padded,
-        "attention_mask": attention_mask
-    }
+    # Stack all processed sequences to form the batch tensors
+    input_ids_batch = torch.stack(processed_input_ids)
+    labels_batch = torch.stack(processed_labels)
 
+    # Create attention mask for the final padded input_ids_batch
+    # Attention mask is 1 for actual tokens and 0 for padding tokens
+    attention_mask_batch = (input_ids_batch != pad_token_id).long()
+
+    return {
+        "input_ids": input_ids_batch,
+        "labels": labels_batch,
+        "attention_mask": attention_mask_batch
+    }
+    
 def find_max_context_length_for_logs(jsonl_dir: Path, log_tokenizer: LogTokenizer, file_limit: Optional[int] = None):
     """
     Finds the JSONL line with the maximum number of characters across all specified files,
@@ -606,7 +669,7 @@ def main():
     # --- 3. Test with DataLoader ---
     if len(log_dataset) > 0:
         # Create the collate_fn with the specific pad_token_id from our tokenizer
-        collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id)
+        collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=1024)
         
         data_loader = DataLoader(log_dataset, batch_size=batch_size_for_test, shuffle=False, collate_fn=collate_function)
         

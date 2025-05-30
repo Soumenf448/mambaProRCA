@@ -1,4 +1,7 @@
 import os
+if __name__ == "__main__":
+    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+
 os.environ["PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT"] = "9999"
 
 import sys, pickle
@@ -14,9 +17,6 @@ from torch.utils.data import DataLoader
 
 seed = 42
 torch.manual_seed(seed)
-
-if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
 sys.path.append(Path(__file__).parent)
 
@@ -207,7 +207,7 @@ def main_clm(model_name: str, device: torch.device) -> None:
         max_seq_len=6144
     )
     
-    collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id)
+    collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=6144)
     dataloader = DataLoader(log_dataset, batch_size=4, shuffle=False, collate_fn=collate_function)
     
     batch = next(iter(dataloader))

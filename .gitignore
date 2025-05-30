@@ -2,3 +2,5 @@
 *.out
 *.pkl
 __pycache__
+outputs/ckpt
+wandb
