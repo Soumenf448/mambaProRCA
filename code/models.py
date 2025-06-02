@@ -1,6 +1,6 @@
 import os
 if __name__ == "__main__":
-    os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 os.environ["PYDEVD_WARN_SLOW_RESOLVE_TIMEOUT"] = "9999"
 
@@ -156,8 +156,6 @@ class SSModelForCLMWithLoRA(torch.nn.Module):
         
         for param in self.model.parameters():
             param.requires_grad = False
-            
-        self.unfreeze_and_mask_embeddings(tokenizer_name=tokenizer_name) # Unfreeze and mask new token embeddings
         
         self.rank = lora_rank
         self.alpha = lora_alpha
@@ -251,14 +249,14 @@ def main_clm(model_name: str, device: torch.device) -> None:
         bnb_4bit_compute_dtype=torch.bfloat16,  
         bnb_4bit_use_double_quant=True,  
     ) if False else None
-    Tmax = 1024
+    Tmax = 6144
     # model = SSModelForCLM(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=Tmax, grad_acc_steps=1, quant_config=quant_config).to(device)
     model = SSModelForCLMWithLoRA(device=device, model_name=model_name, tokenizer_name="EleutherAI/gpt-neox-20b", max_context_len=Tmax, grad_acc_steps=1, quant_config=quant_config, lora_rank=64, lora_alpha=128, layer_names=['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head']).to(device)
     
     log_tokenizer = LogTokenizer(base_tokenizer_name="EleutherAI/gpt-neox-20b")
     log_dataset = LogDataset(
         log_tokenizer=log_tokenizer,
-        jsonl_dir=Path(Path.cwd(), "data/dcn_jsonl"),
+        jsonl_dir=Path(Path.cwd(), "data/dcn_jsonl_test"),
         cache_dir=Path(Path.cwd(), "data/log_dataset_item_cache"),
         rebuild_index_cache=False, # Set to True for the first run or if files change
         file_limit=None, # Process all files
@@ -266,7 +264,7 @@ def main_clm(model_name: str, device: torch.device) -> None:
     )
     
     collate_function = lambda batch: collate_fn(batch, pad_token_id=log_tokenizer.tokenizer.pad_token_id, fixed_max_context_length=Tmax)
-    dataloader = DataLoader(log_dataset, batch_size=4, shuffle=False, collate_fn=collate_function)
+    dataloader = DataLoader(log_dataset, batch_size=1, shuffle=False, collate_fn=collate_function)
     
     batch = next(iter(dataloader))
     input_ids = batch["input_ids"].to(device) # (b, T)
@@ -275,26 +273,26 @@ def main_clm(model_name: str, device: torch.device) -> None:
     
     print(model)
     model.calc_num_params()
-    model.train()
+    model.eval()
     with torch.autocast("cuda"):
         out = model(input_ids=input_ids, attention_mask=attention_mask, labels=labels)
     print(out["logits"], out["loss"], out["acc"])
     
-    print(model)
-    model.eval()
-    gen_config = {
-        "max_new_tokens": 100,
-        "do_sample": True,
-        "top_k": 50,
-        "temperature": 0.7,
-        "output_scores": True,
-        "return_dict_in_generate": True,
-        "eos_token_id": model.tokenizer.eos_token_id,
-        "pad_token_id": model.tokenizer.pad_token_id,
-        "stop_strings": [model.tokenizer.eos_token]
-    }
-    out = model.generate(prompt="Who is prime minister of India?", gen_config=gen_config)
-    print(out)
+    # print(model)
+    # model.eval()
+    # gen_config = {
+    #     "max_new_tokens": 100,
+    #     "do_sample": True,
+    #     "top_k": 50,
+    #     "temperature": 0.7,
+    #     "output_scores": True,
+    #     "return_dict_in_generate": True,
+    #     "eos_token_id": model.tokenizer.eos_token_id,
+    #     "pad_token_id": model.tokenizer.pad_token_id,
+    #     "stop_strings": [model.tokenizer.eos_token]
+    # }
+    # out = model.generate(prompt="Who is prime minister of India?", gen_config=gen_config)
+    # print(out)
     print("DONE")
     
 if __name__ == "__main__":

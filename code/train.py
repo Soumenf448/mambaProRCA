@@ -35,7 +35,7 @@ class LoRAFineTuner:
                                    jsonl_dir=config["jsonl_dir"],
                                    cache_dir=config["cache_dir"],
                                    rebuild_index_cache=True,
-                                   file_limit=max(1, int(config["frac"] * 81)),
+                                   file_limit=max(1, int(config["frac"] * 70)),
                                    max_seq_len=config["max_context_len"])
         
         self.train_ds = Subset(dataset=self.train_ds, indices=range(int(len(self.train_ds) * config["frac"])))
@@ -61,6 +61,9 @@ class LoRAFineTuner:
             layer_names=self.config["target_modules"],
             quant_config=self.quant_config,
         )
+        
+        # Unfreeze token embedding
+        self.model.unfreeze_and_mask_embeddings(tokenizer_name=self.config["tokenizer_name"])
         
         self.optimizer = torch.optim.AdamW(params=self.model.parameters(), 
                                            lr=self.config['initial_lr'], 

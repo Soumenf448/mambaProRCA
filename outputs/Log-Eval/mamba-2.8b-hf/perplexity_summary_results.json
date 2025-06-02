@@ -1,0 +1,644 @@
+{
+    "overall_perplexity": "1.4357",
+    "total_weighted_loss": "2317.6018",
+    "total_tokens_processed": 6408,
+    "per_example_diagnostics": {
+        "0": {
+            "id": 0,
+            "source_preview": "<start> <time>2024-07-31T05:07:57.269Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Started by upstream project \"project/fss3/ci-regression\" build number 2999 \n originally caused by: \n Started by us...",
+            "example_perplexity": "1.30",
+            "example_avg_loss": "0.2629",
+            "num_tokens": 80
+        },
+        "1": {
+            "id": 1,
+            "source_preview": "<start> <time>2024-07-31T05:07:57.324Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] Start of Pipeline</msg> </end>...",
+            "example_perplexity": "1.63",
+            "example_avg_loss": "0.4869",
+            "num_tokens": 43
+        },
+        "2": {
+            "id": 2,
+            "source_preview": "<start> <time>2024-07-31T05:07:57.342Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] library</msg> </end>...",
+            "example_perplexity": "1.63",
+            "example_avg_loss": "0.4891",
+            "num_tokens": 40
+        },
+        "3": {
+            "id": 3,
+            "source_preview": "<start> <time>2024-07-31T05:07:57.344Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Loading library cic-shared-library@project_latest \n Attempting to resolve project_latest from remote references......",
+            "example_perplexity": "1.40",
+            "example_avg_loss": "0.3374",
+            "num_tokens": 66
+        },
+        "4": {
+            "id": 4,
+            "source_preview": "<start> <time>2024-07-31T05:07:57.649Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git --version # 'git version 2.39.3' \n > git ls-remote -- ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/contin...",
+            "example_perplexity": "1.25",
+            "example_avg_loss": "0.2231",
+            "num_tokens": 87
+        },
+        "5": {
+            "id": 5,
+            "source_preview": "<start> <time>2024-07-31T05:07:58.000Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Found match: refs/tags/project_latest revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a \n Resolving tag commit... ...",
+            "example_perplexity": "1.28",
+            "example_avg_loss": "0.2499",
+            "num_tokens": 90
+        },
+        "6": {
+            "id": 6,
+            "source_preview": "<start> <time>2024-07-31T05:08:52.099Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git rev-parse --resolve-git-dir /atldata/jenkins/caches/git-81d7c0835bf8496255df022a875c0e23/.git # timeout=10</...",
+            "example_perplexity": "3.28",
+            "example_avg_loss": "1.1875",
+            "num_tokens": 81
+        },
+        "7": {
+            "id": 7,
+            "source_preview": "<start> <time>2024-07-31T05:08:52.209Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Setting origin to ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git \n > git config...",
+            "example_perplexity": "1.22",
+            "example_avg_loss": "0.1981",
+            "num_tokens": 107
+        },
+        "8": {
+            "id": 8,
+            "source_preview": "<start> <time>2024-07-31T05:08:52.296Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Fetching origin... \n Fetching upstream changes from origin \n > git --version # timeout=10</msg> </end>...",
+            "example_perplexity": "1.42",
+            "example_avg_loss": "0.3532",
+            "num_tokens": 55
+        },
+        "9": {
+            "id": 9,
+            "source_preview": "<start> <time>2024-07-31T05:08:52.400Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git --version # 'git version 2.39.3' \n > git config --get remote.origin.url # timeout=10</msg> </end>...",
+            "example_perplexity": "1.43",
+            "example_avg_loss": "0.3606",
+            "num_tokens": 62
+        },
+        "10": {
+            "id": 10,
+            "source_preview": "<start> <time>2024-07-31T05:08:52.437Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git fetch --tags --force --progress -- origin +refs/heads/*:refs/remotes/origin/* # timeout=10</msg> </end>...",
+            "example_perplexity": "1.41",
+            "example_avg_loss": "0.3418",
+            "num_tokens": 61
+        },
+        "11": {
+            "id": 11,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.068Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git rev-parse refs/tags/project_latest^{commit} # timeout=10</msg> </end>...",
+            "example_perplexity": "1.44",
+            "example_avg_loss": "0.3617",
+            "num_tokens": 53
+        },
+        "12": {
+            "id": 12,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.189Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Resolved tag project_latest revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a</msg> </end>...",
+            "example_perplexity": "1.35",
+            "example_avg_loss": "0.3015",
+            "num_tokens": 66
+        },
+        "13": {
+            "id": 13,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.192Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>The recommended git tool is: git \n Warning: CredentialId \"jenkins\" could not be found. \n Cloning the remote Git re...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4323",
+            "num_tokens": 62
+        },
+        "14": {
+            "id": 14,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.199Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Cloning with configured refspecs honoured and with tags \n Cloning repository ssh://git@bitbucket.fnc.fujitsu.com:7...",
+            "example_perplexity": "4.15",
+            "example_avg_loss": "1.4228",
+            "num_tokens": 166
+        },
+        "15": {
+            "id": 15,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.274Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Fetching upstream changes from ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git \n...",
+            "example_perplexity": "1.29",
+            "example_avg_loss": "0.2577",
+            "num_tokens": 77
+        },
+        "16": {
+            "id": 16,
+            "source_preview": "<start> <time>2024-07-31T05:08:54.349Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git --version # 'git version 2.39.3' \n > git fetch --tags --force --progress -- ssh://git@bitbucket.fnc.fujitsu....",
+            "example_perplexity": "1.25",
+            "example_avg_loss": "0.2246",
+            "num_tokens": 104
+        },
+        "17": {
+            "id": 17,
+            "source_preview": "<start> <time>2024-07-31T05:09:05.817Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git config remote.origin.url ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git #...",
+            "example_perplexity": "1.30",
+            "example_avg_loss": "0.2634",
+            "num_tokens": 74
+        },
+        "18": {
+            "id": 18,
+            "source_preview": "<start> <time>2024-07-31T05:09:05.902Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10</msg> </end>...",
+            "example_perplexity": "1.42",
+            "example_avg_loss": "0.3486",
+            "num_tokens": 60
+        },
+        "19": {
+            "id": 19,
+            "source_preview": "<start> <time>2024-07-31T05:09:05.970Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Avoid second fetch \n Checking out Revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a (project_latest)</msg> </end>...",
+            "example_perplexity": "1.40",
+            "example_avg_loss": "0.3346",
+            "num_tokens": 74
+        },
+        "20": {
+            "id": 20,
+            "source_preview": "<start> <time>2024-07-31T05:09:05.971Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git config core.sparsecheckout # timeout=10</msg> </end>...",
+            "example_perplexity": "1.62",
+            "example_avg_loss": "0.4845",
+            "num_tokens": 49
+        },
+        "21": {
+            "id": 21,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.036Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>> git checkout -f 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a # timeout=10</msg> </end>...",
+            "example_perplexity": "1.32",
+            "example_avg_loss": "0.2805",
+            "num_tokens": 68
+        },
+        "22": {
+            "id": 22,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.354Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Commit message: \"saving manifest for tag project_cd1474\"</msg> </end>...",
+            "example_perplexity": "1.50",
+            "example_avg_loss": "0.4024",
+            "num_tokens": 48
+        },
+        "23": {
+            "id": 23,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.809Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] echo \n running_in_k8s_flag : false</msg> </end>...",
+            "example_perplexity": "1.53",
+            "example_avg_loss": "0.4228",
+            "num_tokens": 52
+        },
+        "24": {
+            "id": 24,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.819Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] node</msg> </end>...",
+            "example_perplexity": "1.58",
+            "example_avg_loss": "0.4555",
+            "num_tokens": 41
+        },
+        "25": {
+            "id": 25,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.886Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Running on node-rtxoialp01 in /data/users/jenkins/workspace/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-deliv...",
+            "example_perplexity": "1.47",
+            "example_avg_loss": "0.3859",
+            "num_tokens": 91
+        },
+        "26": {
+            "id": 26,
+            "source_preview": "<start> <time>2024-07-31T05:09:06.891Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.3990",
+            "num_tokens": 40
+        },
+        "27": {
+            "id": 27,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.159Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ mkdir -p ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-...",
+            "example_perplexity": "1.19",
+            "example_avg_loss": "0.1706",
+            "num_tokens": 184
+        },
+        "28": {
+            "id": 28,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.164Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] writeFile</msg> </end>...",
+            "example_perplexity": "1.53",
+            "example_avg_loss": "0.4246",
+            "num_tokens": 41
+        },
+        "29": {
+            "id": 29,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.168Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.3971",
+            "num_tokens": 40
+        },
+        "30": {
+            "id": 30,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.435Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-san...",
+            "example_perplexity": "1.18",
+            "example_avg_loss": "0.1662",
+            "num_tokens": 188
+        },
+        "31": {
+            "id": 31,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.440Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] deleteDir</msg> </end>...",
+            "example_perplexity": "1.58",
+            "example_avg_loss": "0.4549",
+            "num_tokens": 41
+        },
+        "32": {
+            "id": 32,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.497Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.3990",
+            "num_tokens": 40
+        },
+        "33": {
+            "id": 33,
+            "source_preview": "<start> <time>2024-07-31T05:09:07.768Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ git clone --branch project_latest --depth 1 --single-branch ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/contin...",
+            "example_perplexity": "1.21",
+            "example_avg_loss": "0.1868",
+            "num_tokens": 100
+        },
+        "34": {
+            "id": 34,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.025Z</time> <ltype>JENKINS_GIT_OUTPUT</ltype> <msg>Note: checking out '43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a'. \n You are in 'detached HEAD' state. You can look aro...",
+            "example_perplexity": "1.18",
+            "example_avg_loss": "0.1616",
+            "num_tokens": 160
+        },
+        "35": {
+            "id": 35,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.029Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4344",
+            "num_tokens": 40
+        },
+        "36": {
+            "id": 36,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.305Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (bootstrap-repo-subdir/jenkins/bootstrap-pipeline.groovy)</msg> </end>...",
+            "example_perplexity": "1.42",
+            "example_avg_loss": "0.3491",
+            "num_tokens": 59
+        },
+        "37": {
+            "id": 37,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.318Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.53",
+            "example_avg_loss": "0.4259",
+            "num_tokens": 40
+        },
+        "38": {
+            "id": 38,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.337Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4490",
+            "num_tokens": 41
+        },
+        "39": {
+            "id": 39,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.344Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] writeFile</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4290",
+            "num_tokens": 41
+        },
+        "40": {
+            "id": 40,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.349Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.48",
+            "example_avg_loss": "0.3936",
+            "num_tokens": 40
+        },
+        "41": {
+            "id": 41,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.619Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-san...",
+            "example_perplexity": "1.18",
+            "example_avg_loss": "0.1653",
+            "num_tokens": 189
+        },
+        "42": {
+            "id": 42,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.622Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.52",
+            "example_avg_loss": "0.4207",
+            "num_tokens": 40
+        },
+        "43": {
+            "id": 43,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.626Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // node</msg> </end>...",
+            "example_perplexity": "1.59",
+            "example_avg_loss": "0.4620",
+            "num_tokens": 41
+        },
+        "44": {
+            "id": 44,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.796Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] echo \n running_in_k8s_flag : false</msg> </end>...",
+            "example_perplexity": "1.51",
+            "example_avg_loss": "0.4127",
+            "num_tokens": 52
+        },
+        "45": {
+            "id": 45,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.797Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] node</msg> </end>...",
+            "example_perplexity": "1.60",
+            "example_avg_loss": "0.4683",
+            "num_tokens": 40
+        },
+        "46": {
+            "id": 46,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.895Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>Running on node-rtxoialp01 in /data/users/jenkins/workspace/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-deliv...",
+            "example_perplexity": "1.41",
+            "example_avg_loss": "0.3446",
+            "num_tokens": 87
+        },
+        "47": {
+            "id": 47,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.896Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] {</msg> </end>...",
+            "example_perplexity": "1.56",
+            "example_avg_loss": "0.4433",
+            "num_tokens": 40
+        },
+        "48": {
+            "id": 48,
+            "source_preview": "<start> <time>2024-07-31T05:09:08.902Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.3957",
+            "num_tokens": 40
+        },
+        "49": {
+            "id": 49,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.168Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ mkdir -p ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-...",
+            "example_perplexity": "1.19",
+            "example_avg_loss": "0.1737",
+            "num_tokens": 184
+        },
+        "50": {
+            "id": 50,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.172Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] writeFile</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4321",
+            "num_tokens": 41
+        },
+        "51": {
+            "id": 51,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.177Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.48",
+            "example_avg_loss": "0.3893",
+            "num_tokens": 40
+        },
+        "52": {
+            "id": 52,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.443Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-san...",
+            "example_perplexity": "1.18",
+            "example_avg_loss": "0.1676",
+            "num_tokens": 188
+        },
+        "53": {
+            "id": 53,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.449Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] pwd</msg> </end>...",
+            "example_perplexity": "1.55",
+            "example_avg_loss": "0.4393",
+            "num_tokens": 41
+        },
+        "54": {
+            "id": 54,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.450Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.4003",
+            "num_tokens": 40
+        },
+        "55": {
+            "id": 55,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.718Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ set +ex \n cleaning out dir /data/users/jenkins/workspace/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery...",
+            "example_perplexity": "1.37",
+            "example_avg_loss": "0.3129",
+            "num_tokens": 87
+        },
+        "56": {
+            "id": 56,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.722Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] deleteDir</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4515",
+            "num_tokens": 41
+        },
+        "57": {
+            "id": 57,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.737Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] echo</msg> </end>...",
+            "example_perplexity": "1.63",
+            "example_avg_loss": "0.4876",
+            "num_tokens": 40
+        },
+        "58": {
+            "id": 58,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.738Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>===== parameter values: =====</msg> </end>...",
+            "example_perplexity": "3.58",
+            "example_avg_loss": "1.2753",
+            "num_tokens": 40
+        },
+        "59": {
+            "id": 59,
+            "source_preview": "<start> <time>2024-07-31T05:09:09.741Z</time> <ltype>GENERIC_LOG_MESSAGE</ltype> <msg>PIPELINE_JOB_NAME                  \"json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity\" \n PIPELINE_JOB_FULL_NAME ...",
+            "example_perplexity": "1.45",
+            "example_avg_loss": "0.3742",
+            "num_tokens": 323
+        },
+        "60": {
+            "id": 60,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.035Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ git clone --branch fss3 --depth 1 --single-branch ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integ...",
+            "example_perplexity": "1.41",
+            "example_avg_loss": "0.3416",
+            "num_tokens": 82
+        },
+        "61": {
+            "id": 61,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.036Z</time> <ltype>JENKINS_GIT_OUTPUT</ltype> <msg>Cloning into 'continuous-integration'...</msg> </end>...",
+            "example_perplexity": "2.14",
+            "example_avg_loss": "0.7606",
+            "num_tokens": 45
+        },
+        "62": {
+            "id": 62,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.296Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ rm -rf continuous-integration/continuous-integration-common \n + cd continuous-integration \n + git clone --branch p...",
+            "example_perplexity": "1.21",
+            "example_avg_loss": "0.1911",
+            "num_tokens": 118
+        },
+        "63": {
+            "id": 63,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.557Z</time> <ltype>JENKINS_GIT_OUTPUT</ltype> <msg>Note: checking out '43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a'. \n You are in 'detached HEAD' state. You can look aro...",
+            "example_perplexity": "1.12",
+            "example_avg_loss": "0.1092",
+            "num_tokens": 244
+        },
+        "64": {
+            "id": 64,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.812Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ cd repo \n + rm -rf .git \n + cd ..</msg> </end>...",
+            "example_perplexity": "1.47",
+            "example_avg_loss": "0.3830",
+            "num_tokens": 51
+        },
+        "65": {
+            "id": 65,
+            "source_preview": "<start> <time>2024-07-31T05:09:10.816Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.55",
+            "example_avg_loss": "0.4396",
+            "num_tokens": 40
+        },
+        "66": {
+            "id": 66,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.148Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (continuous-integration/continuous-integration-common/jenkins/ci-pipeline-job.groovy)</msg> </end>...",
+            "example_perplexity": "1.43",
+            "example_avg_loss": "0.3543",
+            "num_tokens": 64
+        },
+        "67": {
+            "id": 67,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.152Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4316",
+            "num_tokens": 40
+        },
+        "68": {
+            "id": 68,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.155Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4520",
+            "num_tokens": 41
+        },
+        "69": {
+            "id": 69,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.160Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.55",
+            "example_avg_loss": "0.4380",
+            "num_tokens": 40
+        },
+        "70": {
+            "id": 70,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.708Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (continuous-integration/continuous-integration-common/jenkins/common/common.utilities.groovy)</msg> </en...",
+            "example_perplexity": "1.36",
+            "example_avg_loss": "0.3096",
+            "num_tokens": 64
+        },
+        "71": {
+            "id": 71,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.713Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.53",
+            "example_avg_loss": "0.4280",
+            "num_tokens": 40
+        },
+        "72": {
+            "id": 72,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.718Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4514",
+            "num_tokens": 41
+        },
+        "73": {
+            "id": 73,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.728Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.55",
+            "example_avg_loss": "0.4376",
+            "num_tokens": 40
+        },
+        "74": {
+            "id": 74,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.791Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (continuous-integration/continuous-integration-common/jenkins/common/common.user_input.groovy)</msg> </e...",
+            "example_perplexity": "1.47",
+            "example_avg_loss": "0.3841",
+            "num_tokens": 65
+        },
+        "75": {
+            "id": 75,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.803Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.53",
+            "example_avg_loss": "0.4275",
+            "num_tokens": 40
+        },
+        "76": {
+            "id": 76,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.811Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4339",
+            "num_tokens": 42
+        },
+        "77": {
+            "id": 77,
+            "source_preview": "<start> <time>2024-07-31T05:09:11.817Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4332",
+            "num_tokens": 40
+        },
+        "78": {
+            "id": 78,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.534Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (continuous-integration/continuous-integration-common/jenkins/common/common.json_pipeline.groovy)</msg> ...",
+            "example_perplexity": "1.44",
+            "example_avg_loss": "0.3623",
+            "num_tokens": 66
+        },
+        "79": {
+            "id": 79,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.545Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4313",
+            "num_tokens": 40
+        },
+        "80": {
+            "id": 80,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.556Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4533",
+            "num_tokens": 41
+        },
+        "81": {
+            "id": 81,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.565Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] load</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4303",
+            "num_tokens": 40
+        },
+        "82": {
+            "id": 82,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.962Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] { (continuous-integration/continuous-integration-common/jenkins/common/common.gitscm.groovy)</msg> </end>...",
+            "example_perplexity": "1.32",
+            "example_avg_loss": "0.2756",
+            "num_tokens": 66
+        },
+        "83": {
+            "id": 83,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.971Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.51",
+            "example_avg_loss": "0.4123",
+            "num_tokens": 41
+        },
+        "84": {
+            "id": 84,
+            "source_preview": "<start> <time>2024-07-31T05:09:12.993Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // load</msg> </end>...",
+            "example_perplexity": "1.57",
+            "example_avg_loss": "0.4541",
+            "num_tokens": 41
+        },
+        "85": {
+            "id": 85,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.004Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] writeFile</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4341",
+            "num_tokens": 41
+        },
+        "86": {
+            "id": 86,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.019Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] sh</msg> </end>...",
+            "example_perplexity": "1.49",
+            "example_avg_loss": "0.4000",
+            "num_tokens": 40
+        },
+        "87": {
+            "id": 87,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.285Z</time> <ltype>JENKINS_SHELL_CMD</ltype> <msg>+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-san...",
+            "example_perplexity": "1.18",
+            "example_avg_loss": "0.1686",
+            "num_tokens": 188
+        },
+        "88": {
+            "id": 88,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.290Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] }</msg> </end>...",
+            "example_perplexity": "1.54",
+            "example_avg_loss": "0.4310",
+            "num_tokens": 40
+        },
+        "89": {
+            "id": 89,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.297Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] // node</msg> </end>...",
+            "example_perplexity": "1.60",
+            "example_avg_loss": "0.4711",
+            "num_tokens": 41
+        },
+        "90": {
+            "id": 90,
+            "source_preview": "<start> <time>2024-07-31T05:09:13.323Z</time> <ltype>JENKINS_PIPELINE</ltype> <msg>[Pipeline] echo</msg> </end>...",
+            "example_perplexity": "1.62",
+            "example_avg_loss": "0.4823",
+            "num_tokens": 40
+        }
+    }
+}
