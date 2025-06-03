@@ -6,12 +6,18 @@ import torch
 import tqdm
 from pathlib import Path
 import json
-from transformers import (BitsAndBytesConfig, DefaultDataCollator)
 from dataset import LogTokenizer, LogDataset, collate_fn
 from models import SSModelForCLMWithLoRA
 from typing import List, Callable
 from transformers import AutoTokenizer
+from transformers import (BitsAndBytesConfig, DefaultDataCollator, AutoTokenizer,
+                          StoppingCriteria, StoppingCriteriaList) # Added StoppingCriteria
+
+from typing import List, Callable, Dict, Any # Added Dict, Any
 from torch.utils.data import Dataset, DataLoader, Subset
+
+# For BLEU score
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction # pip install nltk
 
 seed = 42
 torch.manual_seed(seed)
@@ -89,6 +95,117 @@ class MetricUtils:
                         MetricUtils._save_results(str(output_dir), results_summary, "perplexity_summary")
 
         return results_summary
+
+    @staticmethod
+    def _generate_message_content(
+        model: SSModelForCLMWithLoRA,
+        prompt: str,
+        max_new_tokens: int,
+    ) -> str:
+        """Generates message content until max_new_tokens or stop_token_id."""
+        
+        gen_config = {
+            "max_new_tokens": max_new_tokens,
+            "do_sample": True,
+            "top_k": 50,
+            "temperature": 0.7,
+            "output_scores": True,
+            "return_dict_in_generate": True,
+            "eos_token_id": model.tokenizer.eos_token_id,
+            "pad_token_id": model.tokenizer.pad_token_id,
+            "stop_strings": [model.tokenizer.eos_token, "</msg>"]
+        }
+        out = model.generate(prompt=prompt, gen_config=gen_config)
+        return out["output_text"]
+    
+    @staticmethod
+    def _get_prompt_from_batch(batch: Dict[str, Any], tokenizer: AutoTokenizer) -> dict:
+        """Extracts the prompt from the batch for generation."""
+        assert batch["input_ids"].shape[0] == 1, "Batch size must be 1"
+        input_ids = batch["input_ids"][0].tolist()
+        start_msg_token_id = tokenizer.convert_tokens_to_ids("<msg>")
+        end_msg_token_id = tokenizer.convert_tokens_to_ids("</msg>")
+        
+        # Find the start and end of the message
+        start_idx = input_ids.index(start_msg_token_id) if start_msg_token_id in input_ids else 0
+        end_idx = input_ids.index(end_msg_token_id) if end_msg_token_id in input_ids else len(input_ids)
+        len_msg = end_idx - start_idx
+        
+        # Decode the input_ids to get the prompt
+        prompt_tokens = input_ids[:start_idx+1]
+        reference_tokens = input_ids[start_idx+1:end_idx]  # The message part
+        prompt = tokenizer.decode(prompt_tokens)
+        gt_message_str = tokenizer.decode(reference_tokens)
+        return {"prompt": prompt, "len_msg": len_msg, "gt_message_str": gt_message_str}
+        
+    @staticmethod
+    def evaluate_bleu(
+        dataloader: DataLoader, 
+        model: SSModelForCLMWithLoRA,
+        device: torch.device,
+        output_dir: Path,
+        max_gt_message_tokens: int,
+    ) -> Dict[str, Any]:
+        
+        model.eval()
+        all_results_details = []
+        bleu_scores = []
+        processed_for_bleu_count = 0
+        skipped_due_to_length_count = 0
+        chencherry = SmoothingFunction() # For BLEU smoothing
+
+        with torch.no_grad():
+            with tqdm.tqdm(iterable=dataloader, desc="Evaluating BLEU Score...", unit="example", colour="cyan") as pbar:
+                for i, batch in enumerate(pbar):
+                    out = MetricUtils._get_prompt_from_batch(batch, model.tokenizer)
+                    prompt = out["prompt"]
+                    gt_message_str = out["gt_message_str"]
+                    gt_message_token_len = out["len_msg"]
+                     
+                    if gt_message_token_len > max_gt_message_tokens:
+                        skipped_due_to_length_count += 1
+                        continue # Skip this example
+
+                    processed_for_bleu_count += 1
+                    generated_message_str = MetricUtils._generate_message_content(
+                        model=model,
+                        prompt=prompt,
+                        max_new_tokens=gt_message_token_len + 20, # Allow some buffer for generation
+                    )
+
+                    reference_tokens = [gt_message_str.split()] # List of lists of tokens
+                    hypothesis_tokens = generated_message_str.split()
+                    
+                    try:
+                        bleu = sentence_bleu(reference_tokens, hypothesis_tokens, smoothing_function=chencherry.method1, weights=(0.25, 0.25, 0.25, 0.25))
+                    except ZeroDivisionError: # Can happen if hypothesis is empty or too short
+                        bleu = 0.0
+                    except Exception as e_bleu:
+                        print(f"Warning: BLEU calculation failed for example {i}: {e_bleu}")
+                        bleu = 0.0 # Assign a score to avoid breaking aggregation
+                        
+                    bleu_scores.append(bleu)
+
+                    all_results_details.append({
+                        "id": i,
+                        "gt_message": gt_message_str,
+                        "generated_message": generated_message_str,
+                        "bleu_score": bleu
+                    })
+                    
+                    if i % 20 == 0: # Log progress occasionally
+                        pbar.set_postfix_str(f"Avg BLEU so far: {sum(bleu_scores)/len(bleu_scores):.4f}")
+                        average_bleu = sum(bleu_scores) / len(bleu_scores) if bleu_scores else 0.0
+                        final_summary = {
+                            "average_bleu_score": f"{average_bleu:.4f}",
+                            "max_gt_message_tokens": max_gt_message_tokens,
+                            "num_examples_evaluated_for_bleu": processed_for_bleu_count,
+                            "num_examples_skipped_due_to_length": skipped_due_to_length_count,
+                            "per_example_details": all_results_details # Optional: can make JSON large
+                        }
+                        MetricUtils._save_results(str(output_dir), final_summary, "bleu_score_summary")
+        print(f"\nBLEU Score Evaluation Summary: {final_summary['average_bleu_score']}")
+        return final_summary
     
     @staticmethod
     def _save_results(output_dir: str, results: dict, metric_filename_prefix: str) -> None:
@@ -183,6 +300,15 @@ class LogEvaluator:
                 device=self.device
             )
             return out_dict
+        elif metric == "bleu":
+            out_dict = MetricUtils.evaluate_bleu(
+                dataloader=self.dataloader,
+                model=self.model,
+                output_dir=self.output_dir,
+                device=self.device,
+                max_gt_message_tokens=200,  # Adjust as needed
+            )
+            return out_dict
         else:
             raise ValueError(f"Unsupported metric: {metric}")
 
@@ -194,7 +320,7 @@ def main(model_name: str, device: torch.device) -> None:
         "frac": 1.0, "is_4bit_quant": False,
     }
     evaluator = LogEvaluator(device=device, config=config)
-    out = evaluator.evaluate(metric="perplexity") 
+    out = evaluator.evaluate(metric="bleu") 
     print(out)
     
 if __name__ == "__main__":

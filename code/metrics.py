@@ -112,7 +112,7 @@ class Metrics:
         model.model.eval()
         with torch.no_grad():
             output = model.model.generate(generation_config=gen_config, tokenizer=model.tokenizer, **inputs)
-        output_text = model.tokenizer.decode(output.sequences.tolist()[0], skip_special_tokens=True)
+        output_text = model.tokenizer.decode(output.sequences.tolist()[0], skip_special_tokens=False)
         output_text_raw = output_text.replace(prompt, "").strip()
         output_text = Metrics._truncate_output(output_text_raw, stop_strings=gen_config.stop_strings)
         return {"prompt_text": prompt, "output_text": output_text, "output_text_raw": output_text_raw}

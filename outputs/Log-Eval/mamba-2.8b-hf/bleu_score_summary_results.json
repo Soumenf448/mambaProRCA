@@ -1,0 +1,254 @@
+{
+    "average_bleu_score": "0.1085",
+    "max_gt_message_tokens": 200,
+    "num_examples_evaluated_for_bleu": 41,
+    "num_examples_skipped_due_to_length": 0,
+    "per_example_details": [
+        {
+            "id": 0,
+            "gt_message": "Started by upstream project \"project/fss3/ci-regression\" build number 2999 \n originally caused by: \n Started by user Meenakshisundaram, Balaji (BMEENAKS)",
+            "generated_message": "# 00:07:56 ntp-topology INFO: wait_for_containers_command_initialized: caught RetryFailedError exception, message: No such files or directories: [{'all_of_list': [{'group_name': 'topology-group-device-group-type-qemu",
+            "bleu_score": 0
+        },
+        {
+            "id": 1,
+            "gt_message": "[Pipeline] Start of Pipeline",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.05501080739920602
+        },
+        {
+            "id": 2,
+            "gt_message": "[Pipeline] library",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 3,
+            "gt_message": "Loading library cic-shared-library@project_latest \n Attempting to resolve project_latest from remote references... \n > git --version # timeout=10",
+            "generated_message": "pipeline_execute: container shell command completed",
+            "bleu_score": 0
+        },
+        {
+            "id": 4,
+            "gt_message": "> git --version # 'git version 2.39.3' \n > git ls-remote -- ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git # timeout=10",
+            "generated_message": "HEAD is now at 8768e05... Pull request #60: Made the input text case insensitive for not-allowed \n Fetching project \"test_framework/robot_core\"",
+            "bleu_score": 0
+        },
+        {
+            "id": 5,
+            "gt_message": "Found match: refs/tags/project_latest revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a \n Resolving tag commit... (remote references may be a lightweight tag or an annotated tag)",
+            "generated_message": "HEAD is now at c9ecb1b... Pull request #27: OPCG-323 \n Fetching project \"test_framework/warrior-keywords/kw_1finity\"",
+            "bleu_score": 0
+        },
+        {
+            "id": 6,
+            "gt_message": "> git rev-parse --resolve-git-dir /atldata/jenkins/caches/git-81d7c0835bf8496255df022a875c0e23/.git # timeout=10",
+            "generated_message": "Looking in indexes: https://artifactory.fnc.fujitsu.com/artifactory/api/pypi/pypi/simple",
+            "bleu_score": 0
+        },
+        {
+            "id": 7,
+            "gt_message": "Setting origin to ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git \n > git config remote.origin.url ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git # timeout=10",
+            "generated_message": "> git rev-parse refs/tags/project_latest^{commit} # timeout=10",
+            "bleu_score": 0.053062145153021
+        },
+        {
+            "id": 8,
+            "gt_message": "Fetching origin... \n Fetching upstream changes from origin \n > git --version # timeout=10",
+            "generated_message": "# 00:08:52 ntp-topology INFO: wait_for_containers_command_initialized: caught RetryFailedError exception, message: No such files or directories: [{'all",
+            "bleu_score": 0.013217947626377298
+        },
+        {
+            "id": 9,
+            "gt_message": "> git --version # 'git version 2.39.3' \n > git config --get remote.origin.url # timeout=10",
+            "generated_message": "# 00:08:51 ntp-topology INFO: wait_for_containers_command_initialized: caught RetryFailedError exception, message: No such files or directories: [{'all_of_list': [{'",
+            "bleu_score": 0.012300686288463768
+        },
+        {
+            "id": 10,
+            "gt_message": "> git fetch --tags --force --progress -- origin +refs/heads/*:refs/remotes/origin/* # timeout=10",
+            "generated_message": "remote: Total 2256 (delta 603), reused 0 (delta 603), pack-reused 1744\u001b[K",
+            "bleu_score": 0
+        },
+        {
+            "id": 11,
+            "gt_message": "> git rev-parse refs/tags/project_latest^{commit} # timeout=10",
+            "generated_message": "HEAD is now at 2c9e37c... Pull request #60: Made the input text case insensitive for not-allowed \n Fetching project \"test_framework/robot_core\"",
+            "bleu_score": 0
+        },
+        {
+            "id": 12,
+            "gt_message": "Resolved tag project_latest revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a",
+            "generated_message": "# 00:08:54 ntp-topology INFO: wait_for_containers_command_initialized: caught RetryFailedError exception, message: No such files or directories: [{'all_of_list': [{'group_name':",
+            "bleu_score": 0
+        },
+        {
+            "id": 13,
+            "gt_message": "The recommended git tool is: git \n Warning: CredentialId \"jenkins\" could not be found. \n Cloning the remote Git repository",
+            "generated_message": "HEAD is now at 9312f6f... Pull request #60: Made the input text case insensitive for not-allowed \n Fetching project \"test_framework/robot_core\"",
+            "bleu_score": 0.010182425646195498
+        },
+        {
+            "id": 14,
+            "gt_message": "Cloning with configured refspecs honoured and with tags \n Cloning repository ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git \n > git init /atldata/jenkins/workspace/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity_libs/e62eae340757e7d61d5116e39951ef47814af05333dabd029e21d997a41ab976 # timeout=10",
+            "generated_message": "pip3-virtualenv-install-and-execute-cmd: calling command: \"python3\" \"-m\" \"ensurepip\"",
+            "bleu_score": 0
+        },
+        {
+            "id": 15,
+            "gt_message": "Fetching upstream changes from ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git \n > git --version # timeout=10",
+            "generated_message": "HEAD is now at 78c4d2f... Pull request #60: Made the input text case insensitive for not-allowed \n Fetching project \"test_framework/robot_core\"",
+            "bleu_score": 0.010182425646195498
+        },
+        {
+            "id": 16,
+            "gt_message": "> git --version # 'git version 2.39.3' \n > git fetch --tags --force --progress -- ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git +refs/heads/*:refs/remotes/origin/* # timeout=10",
+            "generated_message": "> git --version # 'git version 2.39.3' \n > git ls-remote -- ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git # timeout=10",
+            "bleu_score": 0.5188629890459651
+        },
+        {
+            "id": 17,
+            "gt_message": "> git config remote.origin.url ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git # timeout=10",
+            "generated_message": "> git checkout -f 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a # timeout=10",
+            "bleu_score": 0.09878765474230743
+        },
+        {
+            "id": 18,
+            "gt_message": "> git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10",
+            "generated_message": "pipeline_execute: container shell command completed",
+            "bleu_score": 0
+        },
+        {
+            "id": 19,
+            "gt_message": "Avoid second fetch \n Checking out Revision 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a (project_latest)",
+            "generated_message": "> git fetch --tags --force --progress -- origin +refs/heads/*:refs/remotes/origin/* # timeout=10",
+            "bleu_score": 0.018850319022747353
+        },
+        {
+            "id": 20,
+            "gt_message": "> git config core.sparsecheckout # timeout=10",
+            "generated_message": "HEAD is now at 0e6d7b9... Pull request #60: Made the input text case insensitive for not-allowed \n Fetching project \"test_framework",
+            "bleu_score": 0
+        },
+        {
+            "id": 21,
+            "gt_message": "> git checkout -f 43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a # timeout=10",
+            "generated_message": "Fetching origin... \n Fetching upstream changes from origin \n > git --version # timeout=10",
+            "bleu_score": 0.05094110796339642
+        },
+        {
+            "id": 22,
+            "gt_message": "Commit message: \"saving manifest for tag project_cd1474\"",
+            "generated_message": "\"instance_name\": \"NE3_CLI\", \n \"instance_type\": \"system_service\", \n \"instance_name\": \"ztm_proxy_data",
+            "bleu_score": 0
+        },
+        {
+            "id": 23,
+            "gt_message": "[Pipeline] echo \n running_in_k8s_flag : false",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.03336574130316504
+        },
+        {
+            "id": 24,
+            "gt_message": "[Pipeline] node",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 25,
+            "gt_message": "Running on node-rtxoialp01 in /data/users/jenkins/workspace/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity \n [Pipeline] {",
+            "generated_message": "Uninstalling pip-9.0.3:",
+            "bleu_score": 0
+        },
+        {
+            "id": 26,
+            "gt_message": "[Pipeline] sh",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.316227766016838
+        },
+        {
+            "id": 27,
+            "gt_message": "+ mkdir -p ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity/321/node.001 \n + mkdir -p /proj/artifacts/jenkins/jenkins-job-utilization-data/master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity/321/node.001",
+            "generated_message": "+ docker rm -f shitshow-latest \n 7b0b5ed8e8d5a6ebc45e1d4c6c5e5c1c8f8b4c3d8ce5b5be5b1f8f8abf9e2f9e \n + docker rmi -f 7b0b5ed8e8d5a6ebc45e1d5b6f8f8abf9e2f9e \n Trying to remove \"shitshow-latest\" \n Already pushed - you are in a \"detached\" state \n DCN-fujitsu% '",
+            "bleu_score": 0.008640609739997756
+        },
+        {
+            "id": 28,
+            "gt_message": "[Pipeline] writeFile",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 29,
+            "gt_message": "[Pipeline] sh",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.316227766016838
+        },
+        {
+            "id": 30,
+            "gt_message": "+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity/321/node.001/node-info.json /proj/artifacts/jenkins/jenkins-job-utilization-data/master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-1-Node-2-Tribs-Routing-delivery-sanity/321/node.001/node-info.json",
+            "generated_message": "+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-2-node-snmpv1-nw/319/node.002/node-info.json /proj/artifacts/jenkins/jenkins-job-utilization-data/master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-2-node-snmpv1-nw/319/node.002/node-info.json",
+            "bleu_score": 0.26591479484724945
+        },
+        {
+            "id": 31,
+            "gt_message": "[Pipeline] deleteDir",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 32,
+            "gt_message": "[Pipeline] sh",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.316227766016838
+        },
+        {
+            "id": 33,
+            "gt_message": "+ git clone --branch project_latest --depth 1 --single-branch ssh://git@bitbucket.fnc.fujitsu.com:7999/iprepo/continuous-integration-common.git bootstrap-repo-subdir \n Cloning into 'bootstrap-repo-subdir'...",
+            "generated_message": "+ cp -- ./master.jenkins.fnc.fujitsu.com/date.20240731/project/fss3/json-nt-ddcn-2-node-snmpv3-nw/268/node.003/node-info.json /proj/artifacts/jenkins/jenkins-job-utilization-data/master.jenkins.",
+            "bleu_score": 0.010847596378846365
+        },
+        {
+            "id": 34,
+            "gt_message": "Note: checking out '43c0b56f36cb45dd3c8377fd1f470a9e8901ae1a'. \n You are in 'detached HEAD' state. You can look around, make experimental \n changes and commit them, and you can discard any commits you make in this \n state without impacting any branches by performing another checkout. \n If you want to create a new branch to retain commits you create, you may \n do so (now or later) by using -b with the checkout command again. Example: \n git checkout -b new_branch_name",
+            "generated_message": "Note: checking out 'tfwk_latest'. \n You are in 'detached HEAD' state. You can look around, make experimental \n changes and commit them, and you can discard any commits you make in this \n state without impacting any branches by performing another checkout. \n If you want to create a new branch to retain commits you create, you may \n do so (now or later) by using -b with the checkout command again. Example: \n git checkout -b new_branch_name \n HEAD is now at c5c9ed8... Pull request #9: FSSFWK-8781: Initial commit #1. \n Fetching project \"test_framework/warrior-",
+            "bleu_score": 0.794959348315823
+        },
+        {
+            "id": 35,
+            "gt_message": "[Pipeline] load",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 36,
+            "gt_message": "[Pipeline] { (bootstrap-repo-subdir/jenkins/bootstrap-pipeline.groovy)",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.09069748827745895
+        },
+        {
+            "id": 37,
+            "gt_message": "[Pipeline] }",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 38,
+            "gt_message": "[Pipeline] // load",
+            "generated_message": "[Pipeline] pwd",
+            "bleu_score": 0.09069748827745895
+        },
+        {
+            "id": 39,
+            "gt_message": "[Pipeline] writeFile",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.1495348781221221
+        },
+        {
+            "id": 40,
+            "gt_message": "[Pipeline] sh",
+            "generated_message": "[Pipeline] sh",
+            "bleu_score": 0.316227766016838
+        }
+    ]
+}
