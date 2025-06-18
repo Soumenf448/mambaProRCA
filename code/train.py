@@ -152,7 +152,7 @@ class LoRAFineTuner:
 def main(model_name: str, device: torch.device) -> None:
     config = {
         "model_name": model_name, "tokenizer_name": "EleutherAI/gpt-neox-20b", "task_name": "proactiveRCA", 
-        "jsonl_dir": "data/dcn_jsonl_train", "cache_dir": "data/index_cache_train", "output_base_dir": "/mnt/commonfolder/networkAI/soumen/proactiveRCA",
+        "jsonl_dir": "data/dcn_jsonl_train", "cache_dir": "data/index_cache_train", "output_base_dir": "/mnt/commonfolder/networkAI/soumen/proactiveRCA_19",
         "num_epochs": 1, "batch_size": 1, "max_context_len": 6144, 
         "frac": 1.0, "target_modules": ['in_proj', 'x_proj', 'dt_proj', 'out_proj', 'lm_head'],
         "initial_lr": 1e-5, "lora_rank": 64, "lora_alpha": 128, "max_grad_norm": 10.0, "weight_decay": 0.1,

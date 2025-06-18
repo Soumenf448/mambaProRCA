@@ -1,6 +1,7 @@
 import re
 import os
 import pickle
+from pathlib import Path
 
 class LogParser:
     """
@@ -261,51 +262,62 @@ class LogParser:
 def main():
     # IMPORTANT: Place your log file in the same directory as this script
     # and name it 'warrior_log.txt', or provide the full path here.
-    LOG_FILE_PATH = "data/dcn_train/json-nt-ddcn-2-Node-dcn-arch-cl-ppp_85.txt" 
-    OUTPUT_PICKLE_FILE = "outputs/parsed_logs/tructured_log_data.pkl"
+    log_directory_train = Path.cwd() / Path("data/dcn_train")
+    log_directory_test = Path.cwd() / Path("data/dcn_test")
+    log_path_list = []
+    for i in log_directory_train.iterdir():
+        log_path_list.append(i)
+    for i in log_directory_test.iterdir():
+        log_path_list.append(i)
+    
+    for i in range(len(log_path_list)):
+        LOG_FILE_PATH = str(log_path_list[i])
+        OUTPUT_PICKLE_FILE = Path.cwd() / Path(f"outputs/parsed_logs/{log_path_list[i].stem}_parsed.pkl")
 
-    try:
-        # 1. Instantiate the parser with the log file path.
-        parser = LogParser(LOG_FILE_PATH)
+        try:
+            # 1. Instantiate the parser with the log file path.
+            parser = LogParser(LOG_FILE_PATH)
 
-        # 2. Run the full parsing and saving process.
-        all_data = parser.parse_and_save(output_filename=OUTPUT_PICKLE_FILE)
+            # 2. Run the full parsing and saving process.
+            all_data = parser.parse_and_save(output_filename=OUTPUT_PICKLE_FILE)
 
-        # 3. Verification and summary after parsing.
-        if all_data:
-            print("\n--- Verification Summary ---")
-            print(f"Total Test Suites Extracted: {len(all_data.get('testsuites_list', []))}")
-            print(f"Total Test Cases Extracted:  {len(all_data.get('testcases_list', []))}")
-            print(f"Total Test Steps Extracted:  {len(all_data.get('teststeps_list', []))}")
-            print(f"Total Sub-steps Extracted:   {len(all_data.get('substeps_list', []))}")
-            print(f"Total Commands Extracted:    {len(all_data.get('commands_list', []))}")
-        else:
-            print("Parsing did not yield any data. Please check the log file and patterns.")
-
-        # 4. Demonstrate loading the data from the saved pickle file.
-        print(f"\n--- Demonstrating Loading from '{OUTPUT_PICKLE_FILE}' ---")
-        if os.path.exists(OUTPUT_PICKLE_FILE):
-            with open(OUTPUT_PICKLE_FILE, 'rb') as f:
-                loaded_data = pickle.load(f)
-            
-            print("Pickle file loaded successfully!")
-            
-            if loaded_data.get('commands_list'):
-                first_command = loaded_data['commands_list'][0]
-                print("\nSample from loaded data (first command's description):")
-                # Pretty print the description dictionary
-                for key, value in first_command['desc'].items():
-                    print(f"  {key}: {value}")
+            # 3. Verification and summary after parsing.
+            if all_data:
+                print("\n--- Verification Summary ---")
+                print(f"Total Test Suites Extracted: {len(all_data.get('testsuites_list', []))}")
+                print(f"Total Test Cases Extracted:  {len(all_data.get('testcases_list', []))}")
+                print(f"Total Test Steps Extracted:  {len(all_data.get('teststeps_list', []))}")
+                print(f"Total Sub-steps Extracted:   {len(all_data.get('substeps_list', []))}")
+                print(f"Total Commands Extracted:    {len(all_data.get('commands_list', []))}")
             else:
-                print("Loaded data contains no commands to display.")
-        else:
-            print(f"Error: Output file '{OUTPUT_PICKLE_FILE}' was not created.")
+                print("Parsing did not yield any data. Please check the log file and patterns.")
 
-    except FileNotFoundError as e:
-        print(f"\nERROR: {e}")
-        print("Please make sure the log file exists and the LOG_FILE_PATH is correct.")
-    except Exception as e:
-        print(f"\nAn unexpected error occurred during parsing: {e}")
+            # 4. Demonstrate loading the data from the saved pickle file.
+            print(f"\n--- Demonstrating Loading from '{OUTPUT_PICKLE_FILE}' ---")
+            if os.path.exists(OUTPUT_PICKLE_FILE):
+                with open(OUTPUT_PICKLE_FILE, 'rb') as f:
+                    loaded_data = pickle.load(f)
+                
+                print("Pickle file loaded successfully!")
+                
+                if loaded_data.get('commands_list'):
+                    first_command = loaded_data['commands_list'][0]
+                    print("\nSample from loaded data (first command's description):")
+                    # Pretty print the description dictionary
+                    for key, value in first_command['desc'].items():
+                        print(f"  {key}: {value}")
+                else:
+                    print("Loaded data contains no commands to display.")
+            else:
+                print(f"Error: Output file '{OUTPUT_PICKLE_FILE}' was not created.")
+
+        except FileNotFoundError as e:
+            print(f"\nERROR: {e}")
+            print("Please make sure the log file exists and the LOG_FILE_PATH is correct.")
+        except Exception as e:
+            print(f"\nAn unexpected error occurred during parsing: {e}")
+            
+        print(f"\n[{i}] --- End of Processing for this log file ---\n")
         
 if __name__ == "__main__":
     main()
