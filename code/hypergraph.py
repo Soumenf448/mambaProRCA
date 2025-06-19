@@ -15,7 +15,7 @@ from pathlib import Path
 # --- Configuration ---
 # Load environment variables from the specified file
 load_dotenv('code/api.env')
-credentials = google.oauth2.credentials.Credentials(os.environ["GOOGLE_GEMINI_API_KEY"])
+credentials = google.oauth2.credentials.Credentials(os.environ["GOOGLE_GEMINI_API_KEY_SNK"]) # !TODO: Change your key
 api_endpoint = "https://api.ai-service.global.fujitsu.com/ai-foundation/chat-ai/gemini/flash:generateContent"
     
 # --- Pydantic Model for Structured LLM Output ---
@@ -244,11 +244,19 @@ def run_single_testcase(PARSED_LOG_PICKLE, HYPERGRAPH_OUTPUT_PICKLE):
 def main():
     # Define input and output file paths
     parsed_file_dir = Path.cwd() / Path("outputs/parsed_logs")
-    for i in parsed_file_dir.iterdir():  
-        PARSED_LOG_PICKLE = i
-        HYPERGRAPH_OUTPUT_PICKLE = Path.cwd() / Path(f"outputs/hypergraphs/{i.stem}_hypergraph.pkl")
-        run_single_testcase(PARSED_LOG_PICKLE, HYPERGRAPH_OUTPUT_PICKLE)
-        print(f"\n[{i}] --- End of Processing for this log file ---\n")
-        
+    parsed_file_list_all = sorted([str(i) for i in parsed_file_dir.iterdir()])
+    
+    # parsed_file_list = parsed_file_list_all[0:27] # Chandrakant
+    parsed_file_list = parsed_file_list_all[27:54] # Shounak
+    # parsed_file_list = parsed_file_list_all[54:]  # Soumen
+    
+    
+    for i in parsed_file_list:  
+        PARSED_LOG_PICKLE = Path(i)
+        HYPERGRAPH_OUTPUT_PICKLE = Path.cwd() / Path(f"outputs/hypergraphs/{Path(i).stem}_hypergraph.pkl")
+        if not HYPERGRAPH_OUTPUT_PICKLE.exists():
+            run_single_testcase(PARSED_LOG_PICKLE, HYPERGRAPH_OUTPUT_PICKLE)
+            print(f"\n[{i}] --- End of Processing for this log file ---\n")
+            
 if __name__ == "__main__":
     main()
